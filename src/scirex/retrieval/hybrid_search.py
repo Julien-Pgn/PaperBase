@@ -21,7 +21,7 @@ def dense_scores(query_dense: np.ndarray, doc_dense: np.ndarray) -> np.ndarray:
 
 
 def sparse_scores(
-    query_sparse: dict[int, float],
+    query_sparse: dict[str, float] | dict[int, float],
     doc_sparse: list[dict[int, float]],
     lexical_match_fn: Callable[[dict[int, float], dict[int, float]], float],
 ) -> np.ndarray:
@@ -29,8 +29,12 @@ def sparse_scores(
 
     lexical_match_fn is injected (pass BGEM3FlagModel.compute_lexical_matching_score
     at the call site) so this module never has to import the embedding model.
+
+    Query keys are cast to int: BGE-M3 returns str token ids, but doc weights come
+    back from DuckDB's MAP(INTEGER, FLOAT) with int ids, and '42' != 42 as dict keys.
     """
-    return np.array([lexical_match_fn(query_sparse, doc) for doc in doc_sparse])
+    query = {int(token_id): weight for token_id, weight in query_sparse.items()}
+    return np.array([lexical_match_fn(query, doc) for doc in doc_sparse])
 
 
 def rrf_fuse(*score_arrays: np.ndarray, k: int = 60) -> np.ndarray:

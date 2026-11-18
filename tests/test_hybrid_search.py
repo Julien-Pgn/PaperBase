@@ -22,6 +22,18 @@ def test_sparse_scores_applies_lexical_match_fn_per_document():
     np.testing.assert_allclose(result, [0.5, 0.3, 0.0])
 
 
+def test_sparse_scores_matches_str_query_keys_against_int_doc_keys():
+    # BGE-M3 returns str token ids; DuckDB's MAP(INTEGER, FLOAT) gives back int ids.
+    query_sparse = {"1": 0.5, "2": 0.3}
+    doc_sparse = [{1: 1.0}, {2: 1.0}, {}]
+
+    def membership_match(q, d):
+        return sum(w * d[tok] for tok, w in q.items() if tok in d)
+
+    result = sparse_scores(query_sparse, doc_sparse, membership_match)
+    np.testing.assert_allclose(result, [0.5, 0.3, 0.0])
+
+
 def test_rrf_fuse_ranks_items_that_win_both_channels_highest():
     dense = np.array([0.9, 0.5, 0.1])
     sparse = np.array([0.8, 0.6, 0.05])
