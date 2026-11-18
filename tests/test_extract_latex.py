@@ -1,6 +1,6 @@
 import tarfile
 
-from scirex.ingestion.extract_latex import extract_latex
+from paperbase.ingestion.extract_latex import extract_latex
 
 
 def _make_tarball(tmp_path, name, files):

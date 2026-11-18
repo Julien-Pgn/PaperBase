@@ -1,7 +1,7 @@
-# PROJECT.md — SciRex working state
+# PROJECT.md — PaperBase working state
 
 Last updated: 2026-07-24
-Repo: github.com/Julien-Pgn/scirex
+Repo: github.com/Julien-Pgn/PaperBase
 
 ## Current phase
 ✅ Phase 0 complete. Starting Phase 1 — ingestion.
@@ -14,15 +14,15 @@ local RAG system over this corpus.
 
 ## Environment
 - Base image: `nvcr.io/nvidia/pytorch:26.01-py3` (Python 3.12.3, PyTorch 2.10.0a NV-patched, CUDA 13.1, sm_120 supported)
-- Image tag: `scirex:dev`
+- Image tag: `paperbase:dev`
 - Hardware: RTX 5070 Ti (Blackwell, 16 GB VRAM)
 - Host driver: 590.48.01 (CUDA 13.0) 
 - Package manager: `uv` 0.9.24 (preinstalled in NGC). `--system --break-system-packages` for installs.
-- Editable install: confirmed working via `_editable_impl_scirex.pth`. Host edits are live in container.
+- Editable install: confirmed working via `_editable_impl_paperbase.pth`. Host edits are live in container.
 
 ## Decisions log
 ### Phase 0 (setup)
-2026-04-29: Repo named scirex. License MIT (file: LICENSE.txt).
+2026-04-29: Repo named paperbase. License MIT (file: LICENSE.txt).
 2026-04-29: Base = NGC PyTorch 26.01-py3, NOT NeMo (NeMo adds ~20 GB framework overhead, not needed for single-GPU research).
 2026-04-29: NumPy 2.x acceptable — NGC ships numpy==2.1.0 with PyTorch built against it.
 2026-04-29: uv for dependency mgmt. pyproject.toml declares loose constraints; uv.lock records exact versions.
@@ -87,7 +87,7 @@ S3 requester-pays bucket considered and rejected: ~$100 + 1.1TB for content we d
 2026-06-16: Pivoting the project by recreating the duckdb and tables for regular updates and getting more informations. Modification of the scripts to run the ocr and update the tables when md and html files are saved. 
 2026-06-16: How it works: you select a subset of papers of interest from the papers table and use fetch_files.py to download the pdfs in data/raw then the scripts/run_ocr.py will OCR all the papers found and create new subfolders in data/processed/{arxiv_id}/ to store the md file, the html and all the image for later multimodal RAG. 
 2026-07-01: the initial paper selection is not precise so I need to do a hybrid search that combines a keyword and semantic meaning followed by reranking. Then OCR and the proper RAG. 
-2026-07-18: Repo audit + cleanup. Removed src/scirex/layoutreader/ (LayoutLMv3 training/eval code, abandoned per 2026-05-09/2026-05-20 decisions above; broken imports, undeclared nltk/datasets/typer deps, 6 mypy errors) and src/scirex/ocr/crnn/ (empty dir, vestige of the abandoned EasyOCR/CRNN path). Removed data/ocr_hf/, data/ocr_vllm/ (V1 notebook exploration outputs, superseded by data/processed/) and debug_page.html (stray container artifact). Added unit tests for the pure logic in ocr/modern/pipeline.py, ingestion/fetch_files.py, ingestion/extract_latex.py (0%→43% coverage on those modules); CI now installs chandra-ocr (lightweight, no torch/GPU deps) so these tests run in the workflow. README's "Contributions" section corrected to distinguish what runs today (ingestion, OCR) from what's planned (chunking/RAG/KG) — it previously implied llm/rag/extraction modules had code, but those directories are still empty. ROADMAP.md Phase 2 status intentionally left unchanged pending review.
+2026-07-18: Repo audit + cleanup. Removed src/paperbase/layoutreader/ (LayoutLMv3 training/eval code, abandoned per 2026-05-09/2026-05-20 decisions above; broken imports, undeclared nltk/datasets/typer deps, 6 mypy errors) and src/paperbase/ocr/crnn/ (empty dir, vestige of the abandoned EasyOCR/CRNN path). Removed data/ocr_hf/, data/ocr_vllm/ (V1 notebook exploration outputs, superseded by data/processed/) and debug_page.html (stray container artifact). Added unit tests for the pure logic in ocr/modern/pipeline.py, ingestion/fetch_files.py, ingestion/extract_latex.py (0%→43% coverage on those modules); CI now installs chandra-ocr (lightweight, no torch/GPU deps) so these tests run in the workflow. README's "Contributions" section corrected to distinguish what runs today (ingestion, OCR) from what's planned (chunking/RAG/KG) — it previously implied llm/rag/extraction modules had code, but those directories are still empty. ROADMAP.md Phase 2 status intentionally left unchanged pending review.
 2026-07-18: CI broken by a newer uv release enforcing PEP 668 more strictly — `uv pip install --system` started failing with "externally managed" even against uv's own managed Python (not just the OS one at /usr). Fix: added `--break-system-packages` to the install step. Safe here since the CI runner is a disposable container, not a persistent machine.
 2026-07-22: corpus curation should happen on abstracts already in the duck db
 2026-07-22: hybrid serach combining dense and sparse embeddings using BGE-M3 is the best approach to find all relevant papers (precision at 0.7 and recall at 0.7) -> classifying using a local LLM (Qwen2.5-7B-Instruct) increases precision up to 0.82 with a recall to 0.82 which validates the two stage approach. 
@@ -115,9 +115,9 @@ topic-relevant.
 scoped to Phase 4's post-OCR chunk vectors.
 
 **Built (2026-07-22/23):**
-- `src/scirex/retrieval/hybrid_search.py` — pure `dense_scores`/`sparse_scores`/`rrf_fuse`/
+- `src/paperbase/retrieval/hybrid_search.py` — pure `dense_scores`/`sparse_scores`/`rrf_fuse`/
   `recommend_top_k`, no model/DB imports, unit-tested without GPU.
-- `src/scirex/retrieval/embed.py`, `classify.py` — BGE-M3 and Qwen2.5-7B-Instruct wrappers; heavy
+- `src/paperbase/retrieval/embed.py`, `classify.py` — BGE-M3 and Qwen2.5-7B-Instruct wrappers; heavy
   imports (FlagEmbedding/transformers/torchao) are lazy, loaded only inside the functions that need
   them, so the rest of each module (batching, DB I/O, prompt construction, verdict parsing) is
   testable without GPU/torch installed at all.
@@ -186,7 +186,7 @@ whichever topic's backlog happened to be sitting there (caught in practice: it p
 `genai_subset` PDFs instead of the intended quantization batch). `--keyword` was already documented
 as "the topic for this batch" but was never actually used to *select* files, only to label results
 afterward. Fixed: PDF selection is now `get_pdf_paths_for_keyword()` (new, in
-`src/scirex/ocr/modern/pipeline.py`), querying `paper_local WHERE keyword_for_ocr = --keyword AND
+`src/paperbase/ocr/modern/pipeline.py`), querying `paper_local WHERE keyword_for_ocr = --keyword AND
 pdf_path IS NOT NULL` — `--input-dir` removed entirely (the DB already has the full path, so a
 directory glob was redundant as well as unsafe). 4 new tests in `tests/test_ocr_pipeline.py`.
 
@@ -247,12 +247,12 @@ entry" — this is that):**
    write it once, store as parquet, reuse it for every tuning decision below so nothing gets tuned by
    vibes.
 2. **Notebook-prototype the chunker first** (~1 day) — matches this project's established pattern
-   (every phase so far prototyped in `notebooks/` before graduating to `src/scirex/`). Try a
+   (every phase so far prototyped in `notebooks/` before graduating to `src/paperbase/`). Try a
    markdown-aware splitter on a handful of real `.md` files from `data/processed/`: split on header
    boundaries, keep tables/equations intact (don't split mid-table or mid-equation), target
    ~512-1024 tokens per chunk, prepend title + section path to each chunk's text so a chunk read in
    isolation still carries context. Eyeball a few real chunks before formalizing anything.
-3. **Graduate into `src/scirex/chunking/chunker.py`** (~0.5 day) — pure function(s): markdown text
+3. **Graduate into `src/paperbase/chunking/chunker.py`** (~0.5 day) — pure function(s): markdown text
    in, list of chunk dicts out (text, section, char_start/end, n_tokens). No DB/model imports,
    unit-testable — same "pure logic separated from I/O" split already used for `hybrid_search.py`.
 4. **`chunks` table migration + `scripts/chunk_papers.py`** (~1 day) — same shape as
@@ -260,10 +260,10 @@ entry" — this is that):**
    `chunker_version`, so a future re-chunk with a new version doesn't collide with old chunks), dual
    file+stderr logging, summary banner.
 5. **Qdrant as a Docker service** (~0.5 day) — new `run_qdrant.sh`, same shape as `run_vllm.sh`,
-   joined to the existing `scirex-net` Docker network so it's reachable by hostname from the dev
+   joined to the existing `paperbase-net` Docker network so it's reachable by hostname from the dev
    container, matching how `chandra-vllm` already works.
 6. **`scripts/embed_chunks.py`** (~1 day) — BGE-M3 dense+sparse over chunk text, reusing
-   `src/scirex/retrieval/embed.py`'s patterns, upserting into Qdrant with payload
+   `src/paperbase/retrieval/embed.py`'s patterns, upserting into Qdrant with payload
    `{arxiv_id, section, page, category, published_date}`. Idempotent, same style as everything else.
 7. **Retrieval eval against the golden set** (~0.5-1 day) — Recall@k, MRR. Run once without a
    reranker (baseline), then once with `bge-reranker` — keep it only if it measurably helps at
@@ -316,8 +316,8 @@ Deferred items move to Phase 7 (parked), not deleted.
 - bioRxiv ingestion: still v2.
 
 ## Phase 1 artifacts (for reference)
-src/scirex/ingestion/fetch_files.py — async-free fetcher with tenacity retries
-src/scirex/ingestion/extract_latex.py — tarball extractor with security-hardened extractall
+src/paperbase/ingestion/fetch_files.py — async-free fetcher with tenacity retries
+src/paperbase/ingestion/extract_latex.py — tarball extractor with security-hardened extractall
 data/arxiv_metadata.duckdb — 5-table normalized schema
 data/raw/pdfs/ — ~900 PDFs
 data/raw/sources/ — ~900 source tarballs
@@ -325,7 +325,7 @@ data/interim/latex/{arxiv_id}/ — 916 extracted LaTeX trees
 data/logs/fetch.log, data/logs/extract.log — structured run logs
 
 ## Phase 3.5 artifacts (for reference)
-src/scirex/retrieval/{hybrid_search,embed,classify}.py — hybrid search + BGE-M3/Qwen2.5-7B wrappers
+src/paperbase/retrieval/{hybrid_search,embed,classify}.py — hybrid search + BGE-M3/Qwen2.5-7B wrappers
 scripts/embed_abstracts.py, scripts/search_topic.py — CLI scripts, same shape as fetch_files.py/run_ocr.py
 data/arxiv_metadata.duckdb — abstract_embeddings, topic_subset tables added
 data/quantization_rubric.txt — hand-written classification rubric for the "quantization" topic

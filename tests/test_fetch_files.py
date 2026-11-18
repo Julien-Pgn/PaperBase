@@ -3,7 +3,7 @@ from pathlib import Path
 import duckdb
 import pytest
 
-from scirex.ingestion.fetch_files import get_papers_to_fetch, update_paper_paths
+from paperbase.ingestion.fetch_files import get_papers_to_fetch, update_paper_paths
 
 
 @pytest.fixture

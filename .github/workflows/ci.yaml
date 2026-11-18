@@ -33,4 +33,4 @@ jobs:
         continue-on-error: true  
 
       - name: Pytest
-        run: pytest -q --cov=scirex --cov-report=term-missing --cov-report=xml
+        run: pytest -q --cov=paperbase --cov-report=term-missing --cov-report=xml

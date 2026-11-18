@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1.7
-# SciRex development image
+# PaperBase development image
 # Base: NVIDIA NGC PyTorch 26.01 (PyTorch 2.10.0a, CUDA 13.1.1, Python 3.12, Ubuntu 24.04)
 # Supports Blackwell sm_120 (RTX 50-series) natively.
 
 FROM nvcr.io/nvidia/pytorch:26.01-py3
 
-LABEL project="scirex"
+LABEL project="paperbase"
 LABEL description="PDF-to-markdown scientific-knowledge pipeline"
 LABEL maintainer="Julien Pigeon"
 

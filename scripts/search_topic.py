@@ -23,15 +23,15 @@ import numpy as np
 import pandas as pd
 import torch
 
-from scirex.retrieval.classify import (
+from paperbase.retrieval.classify import (
     build_few_shot_block,
     build_prompt,
     classify_paper,
     load_classifier,
     select_few_shot_examples,
 )
-from scirex.retrieval.embed import load_corpus_slice, load_model
-from scirex.retrieval.hybrid_search import dense_scores, recommend_top_k, rrf_fuse, sparse_scores
+from paperbase.retrieval.embed import load_corpus_slice, load_model
+from paperbase.retrieval.hybrid_search import dense_scores, recommend_top_k, rrf_fuse, sparse_scores
 
 DB_PATH = Path("data/arxiv_metadata.duckdb")
 LOG_DIR = Path("data/logs")

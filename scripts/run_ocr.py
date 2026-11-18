@@ -12,7 +12,7 @@ os.environ.setdefault("VLLM_API_BASE", "http://chandra-vllm:8000/v1")
 os.environ.setdefault("VLLM_MODEL_NAME", "chandra")
 
 # Import the functions from the pipeline module
-from scirex.ocr.modern.pipeline import (
+from paperbase.ocr.modern.pipeline import (
     get_pdf_paths_for_keyword,
     make_paper_dir,
     ocr_images,

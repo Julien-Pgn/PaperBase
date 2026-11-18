@@ -1,6 +1,6 @@
 import pandas as pd
 
-from scirex.retrieval.classify import (
+from paperbase.retrieval.classify import (
     build_few_shot_block,
     build_prompt,
     parse_verdict,

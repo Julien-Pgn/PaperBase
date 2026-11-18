@@ -5019,7 +5019,7 @@ wheels = [
 ]
 
 [[package]]
-name = "scirex"
+name = "paperbase"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
@@ -5181,7 +5181,7 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "sacrebleu", marker = "extra == 'ocr'" },
     { name = "scikit-image", marker = "extra == 'ocr'" },
-    { name = "scirex", extras = ["dev", "training", "ocr", "llm", "graph", "rag", "demo"], marker = "extra == 'all'" },
+    { name = "paperbase", extras = ["dev", "training", "ocr", "llm", "graph", "rag", "demo"], marker = "extra == 'all'" },
     { name = "sentence-transformers", marker = "extra == 'rag'" },
     { name = "sentencepiece", marker = "extra == 'training'" },
     { name = "sqlalchemy", specifier = ">=2" },

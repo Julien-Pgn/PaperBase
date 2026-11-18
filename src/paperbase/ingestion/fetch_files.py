@@ -6,7 +6,7 @@ Failures per paper are logged but do not stop the run.
 Resumable: re-running skips papers whose `pdf_path` is already set in `papers`.
 
 Usage:
-    python -m scirex.ingestion.fetch_files --table benchmark_subset
+    python -m paperbase.ingestion.fetch_files --table benchmark_subset
 """
 
 import argparse
@@ -32,7 +32,7 @@ SRC_DIR = Path("data/raw/sources")
 LOG_DIR = Path("data/logs")
 
 # Polite identifier — arXiv asks API users to identify themselves
-HEADERS = {"User-Agent": "SciRex/0.1 (https://github.com/Julien-Pgn/scirex)"}
+HEADERS = {"User-Agent": "PaperBase/0.1 (https://github.com/Julien-Pgn/PaperBase)"}
 
 # Pause between papers (arXiv asks for >= 3s between requests)
 SLEEP_BETWEEN_PAPERS = 3

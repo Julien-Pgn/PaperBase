@@ -28,7 +28,7 @@ log "=== Starting pipeline for topic '$TOPIC' ==="
 fetch_ok=false
 for attempt in $(seq 1 "$MAX_RETRIES"); do
     log "Fetch attempt $attempt/$MAX_RETRIES"
-    if ./run_container.sh exec python -m scirex.ingestion.fetch_files \
+    if ./run_container.sh exec python -m paperbase.ingestion.fetch_files \
         --table topic_subset --topic "$TOPIC" 2>&1 | tee -a "$LOG"; then
         fetch_ok=true
         break

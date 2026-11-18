@@ -3,7 +3,7 @@ After downloading the PDFs and the LaTeX sources, let's unzip them to build our 
 Updates which arXiv papers have LaTeX source available in our DuckDB.
 
 Usage:
-In the container run: python -m scirex.ingestion.extract_latex
+In the container run: python -m paperbase.ingestion.extract_latex
 """
 
 import logging

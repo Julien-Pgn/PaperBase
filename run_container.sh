@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SciRex container launcher.
+# PaperBase container launcher.
 # Usage: ./run_container.sh <mode> [args...]
 # Modes:
 #   shell                         interactive bash inside the container (default)
@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-IMAGE="scirex:dev"
+IMAGE="paperbase:dev"
 
 # No GPU on purpose. This is to avoid conflicts with other Docker containers that require full GPU access, e.g. for training. If you want GPU access in the container, you can modify the COMMON_FLAGS below to include "--gpus all" and ensure you have the NVIDIA Container Toolkit installed on your system.
 COMMON_FLAGS=(
@@ -22,7 +22,7 @@ COMMON_FLAGS=(
     --ulimit memlock=-1
     --ulimit stack=67108864
     --shm-size=16g
-    --network scirex-net
+    --network paperbase-net
     -v "$(pwd):/workspace"
     -v "$HOME/.cache/huggingface:/root/.cache/huggingface"
     -e "WANDB_API_KEY=${WANDB_API_KEY:-}"
@@ -63,8 +63,8 @@ case "$mode" in
     # "jupyter" starts JupyterLab in detached mode, mapping port 8888 to the host. It also sets up Jupyter with no token or password for easy access. Logs can be viewed with "./run_container.sh logs jupyter" and the container can be stopped with "./run_container.sh stop jupyter".
     jupyter)
         # Remove any existing container with the same name to avoid conflicts - idempotent restart (=restarts the container even if another is running). 
-        docker rm -f scirex-jupyter >/dev/null 2>&1 || true
-        docker run -d --name scirex-jupyter \
+        docker rm -f paperbase-jupyter >/dev/null 2>&1 || true
+        docker run -d --name paperbase-jupyter \
             --gpus all \
             "${COMMON_FLAGS[@]}" \
             -p 127.0.0.1:8888:8888 \
@@ -74,7 +74,7 @@ case "$mode" in
         # Wait for Jupyter to print its startup URL (max ~15s), then show it
         echo "Waiting for Jupyter to start..."
         for i in {1..15}; do
-            url=$(docker exec scirex-jupyter jupyter server list 2>/dev/null \
+            url=$(docker exec paperbase-jupyter jupyter server list 2>/dev/null \
                     | grep -oE 'http://[^ ]+' | head -1 || true)
             if [ -n "$url" ]; then
                 # Replace 0.0.0.0 with localhost since we bound to 127.0.0.1
@@ -92,8 +92,8 @@ case "$mode" in
     # "jupyter_nogpu" starts JupyterLab in detached mode, mapping port 8888 to the host without any access to GPU to avoid conflicts with other Docker container requiring full GPU access. 
     jupyter_nogpu)
         # Remove any existing container with the same name to avoid conflicts - idempotent restart (=restarts the container even if another is running). 
-        docker rm -f scirex-jupyter >/dev/null 2>&1 || true
-        docker run -d --name scirex-jupyter \
+        docker rm -f paperbase-jupyter >/dev/null 2>&1 || true
+        docker run -d --name paperbase-jupyter \
             "${COMMON_FLAGS[@]}" \
             -p 127.0.0.1:8888:8888 \
             "$IMAGE" \
@@ -102,7 +102,7 @@ case "$mode" in
         # Wait for Jupyter to print its startup URL (max ~15s), then show it
         echo "Waiting for Jupyter to start..."
         for i in {1..15}; do
-            url=$(docker exec scirex-jupyter jupyter server list 2>/dev/null \
+            url=$(docker exec paperbase-jupyter jupyter server list 2>/dev/null \
                     | grep -oE 'http://[^ ]+' | head -1 || true)
             if [ -n "$url" ]; then
                 # Replace 0.0.0.0 with localhost since we bound to 127.0.0.1
@@ -119,12 +119,12 @@ case "$mode" in
 
     # "streamlit" starts the Streamlit demo app in detached mode, mapping port 8501 to the host. Logs can be viewed with "./run_container.sh logs streamlit" and the container can be stopped with "./run_container.sh stop streamlit".
     streamlit)
-        docker rm -f scirex-streamlit >/dev/null 2>&1 || true
-        docker run -d --name scirex-streamlit \
+        docker rm -f paperbase-streamlit >/dev/null 2>&1 || true
+        docker run -d --name paperbase-streamlit \
             "${COMMON_FLAGS[@]}" \
             -p 8501:8501 \
             "$IMAGE" \
-            streamlit run src/scirex/demo/app.py \
+            streamlit run src/paperbase/demo/app.py \
                 --server.address 0.0.0.0 --server.port 8501 \
                 --server.headless true
         echo "Streamlit: http://localhost:8501"
@@ -138,9 +138,9 @@ case "$mode" in
             echo "stop requires a target, e.g. stop jupyter" >&2
             exit 1
         fi
-        docker rm -f "scirex-${target}" >/dev/null 2>&1 \
-            && echo "Stopped scirex-${target}" \
-            || echo "scirex-${target} was not running"
+        docker rm -f "paperbase-${target}" >/dev/null 2>&1 \
+            && echo "Stopped paperbase-${target}" \
+            || echo "paperbase-${target} was not running"
         ;;
 
     # "logs" allows you to follow logs from a detached container by name, e.g. "./run_container.sh logs jupyter" or "./run_container.sh logs streamlit"
@@ -150,7 +150,7 @@ case "$mode" in
             echo "logs requires a target, e.g. logs jupyter" >&2
             exit 1
         fi
-        docker logs -f "scirex-${target}"
+        docker logs -f "paperbase-${target}"
         ;;
 
     # "build" allows you to rebuild the Docker image after making changes to the Dockerfile or dependencies, e.g. "./run_container.sh build"

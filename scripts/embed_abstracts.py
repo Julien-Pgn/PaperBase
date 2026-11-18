@@ -15,7 +15,7 @@ from pathlib import Path
 
 import duckdb
 
-from scirex.retrieval.embed import (
+from paperbase.retrieval.embed import (
     embed_texts,
     get_unembedded_abstracts,
     load_model,

@@ -1,4 +1,4 @@
-# SciRex
+# PaperBase
 
 A PDF-to-markdown knowledge pipeline to build RAG databases for AI query on scientific topics.
 

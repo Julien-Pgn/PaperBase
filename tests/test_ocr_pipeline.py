@@ -4,7 +4,7 @@ import duckdb
 import pytest
 from PIL import Image
 
-from scirex.ocr.modern.pipeline import (
+from paperbase.ocr.modern.pipeline import (
     extract_images,
     get_pdf_paths_for_keyword,
     parse_html,
@@ -81,7 +81,7 @@ def test_parse_markdown_converts_basic_html():
 
 
 def test_parse_markdown_returns_empty_string_on_error(monkeypatch):
-    import scirex.ocr.modern.pipeline as pipeline
+    import paperbase.ocr.modern.pipeline as pipeline
 
     class BoomMarkdownify:
         def __init__(self, **kwargs):

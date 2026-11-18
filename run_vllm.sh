@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vLLM server launcher for SciRex.
+# vLLM server launcher for PaperBase.
 # Usage: ./run_vllm.sh <mode>
 # Modes:
 #   up        start the vLLM server (detached), serving Chandra-OCR-2 on port 8000
@@ -27,7 +27,7 @@ case "$CMD" in
             --gpus all \
             --ipc=host \
             -p 127.0.0.1:8000:8000 \
-            --network scirex-net \
+            --network paperbase-net \
             -v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
             "$IMAGE" \
                 --model datalab-to/chandra-ocr-2 \

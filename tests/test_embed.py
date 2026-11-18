@@ -2,7 +2,7 @@ import duckdb
 import numpy as np
 import pytest
 
-from scirex.retrieval.embed import (
+from paperbase.retrieval.embed import (
     embed_texts,
     get_unembedded_abstracts,
     load_corpus_slice,

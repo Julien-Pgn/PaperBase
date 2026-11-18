@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from scirex.retrieval.hybrid_search import dense_scores, recommend_top_k, rrf_fuse, sparse_scores
+from paperbase.retrieval.hybrid_search import dense_scores, recommend_top_k, rrf_fuse, sparse_scores
 
 
 def test_dense_scores_is_dot_product():
