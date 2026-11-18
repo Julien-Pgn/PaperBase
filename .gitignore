@@ -42,5 +42,3 @@ mlruns/
 # Notebooks output (keep source, strip outputs)
 .ipynb_checkpoints/
 
-# Files
-CONTRACT.md
