@@ -17,10 +17,12 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
+          activate-environment: true
           enable-cache: true
-          
+
+      # pandas is not in pyproject: the NGC container provides it, the CI runner does not.
       - name: Install package + dev deps
-        run: uv pip install --system --break-system-packages -e ".[dev]" duckdb chandra-ocr
+        run: uv pip install -e ".[dev]" duckdb chandra-ocr pandas
 
       - name: Lint (ruff)
         run: ruff check src tests scripts
